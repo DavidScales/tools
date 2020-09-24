@@ -115,8 +115,8 @@ func (mw *mdWriter) write(nodes ...types.Node) error {
 			mw.table(n)
 		case *types.InfoboxNode:
 			mw.infobox(n)
-		//case *types.SurveyNode:
-		//	mw.survey(n)
+		case *types.SurveyNode:
+			mw.survey(n)
 		case *types.HeaderNode:
 			mw.header(n)
 		case *types.YouTubeNode:
@@ -270,6 +270,22 @@ func (mw *mdWriter) infobox(n *types.InfoboxNode) {
 	}
 
 	mw.Prefix = ""
+}
+
+func (mw *mdWriter) survey(n *types.SurveyNode) {
+	mw.newBlock()
+	mw.writeString("<form>")
+	mw.writeBytes(newLine)
+	for _, g := range n.Groups {
+		// TODO: do these values need to be escaped like in the html renderer?
+		mw.writeString(fmt.Sprintf(`<name>%s</name>`, g.Name))
+		mw.writeBytes(newLine)
+		for _, o := range g.Options {
+			mw.writeString(fmt.Sprintf(`<input value="%s"/>`, o))
+			mw.writeBytes(newLine)
+		}
+	}
+	mw.writeString("</form>")
 }
 
 func (mw *mdWriter) header(n *types.HeaderNode) {
